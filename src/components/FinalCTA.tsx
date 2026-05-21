@@ -205,13 +205,13 @@ function ConfettiField() {
       const { width, height } = el.getBoundingClientRect();
       if (width === 0 || height === 0) return;
       const count = Math.min(
-        220,
-        Math.max(120, Math.floor((width * height) / 4200)),
+        1000,
+        Math.max(600, Math.floor((width * height) / 650)),
       );
       const arr: Spec[] = Array.from({ length: count }).map(() => ({
-        x: rand(6, width - 6),
-        y: rand(6, height - 6),
-        size: rand(8, 16),
+        x: rand(4, width - 4),
+        y: rand(4, height - 4),
+        size: rand(5, 11),
         rotation: rand(0, 360),
         color: pick(COLORS),
         shape: pick(SHAPES),
@@ -269,6 +269,9 @@ function ConfettiField() {
 
 export default function FinalCTA() {
   const [off, setOff] = useState({ x: 0, y: 0, r: 0 });
+  const sectionRef = useRef<HTMLElement>(null);
+  const noBtnWrapRef = useRef<HTMLDivElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
 
   const dodge = () => {
     if (
@@ -276,22 +279,48 @@ export default function FinalCTA() {
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
     )
       return;
-    // Bias upward so it doesn't drift down into the confetti band.
-    setOff({
-      x: rand(-220, 220),
-      y: rand(-90, 30),
-      r: rand(-7, 7),
-    });
+
+    // Desired roam range — generous so it can reach into the confetti band.
+    let x = rand(-320, 320);
+    let y = rand(-150, 480);
+    const r = rand(-10, 10);
+
+    // Clamp so the button stays inside the section and BELOW the headline.
+    const section = sectionRef.current;
+    const wrap = noBtnWrapRef.current;
+    const heading = headingRef.current;
+    if (section && wrap) {
+      const s = section.getBoundingClientRect();
+      const b = wrap.getBoundingClientRect(); // natural rect (wrapper has no transform)
+      const pad = 8;
+      const headingPad = 20;
+      const headingBottom = heading
+        ? heading.getBoundingClientRect().bottom + headingPad
+        : s.top + pad;
+      const minX = s.left + pad - b.left;
+      const maxX = s.right - pad - b.right;
+      // Upper bound: bottom of the headline (whichever is lower of the two limits).
+      const minY = Math.max(s.top + pad - b.top, headingBottom - b.top);
+      const maxY = s.bottom - pad - b.bottom;
+      x = Math.max(minX, Math.min(maxX, x));
+      y = Math.max(minY, Math.min(maxY, y));
+    }
+
+    setOff({ x, y, r });
   };
 
   return (
     <section
+      ref={sectionRef}
       id="contact"
       className="relative isolate flex min-h-screen flex-col overflow-hidden bg-paper pt-28 pb-0 sm:pt-40"
     >
       {/* Headline + buttons — own area, sits ABOVE the confetti band */}
       <div className="relative z-10 mx-auto flex w-full max-w-[1200px] flex-1 flex-col items-center justify-center px-5 pb-16 text-center">
-        <h2 className="font-display text-[clamp(2.75rem,9vw,7rem)] leading-[1.05] font-bold tracking-tight text-ink">
+        <h2
+          ref={headingRef}
+          className="font-display text-[clamp(2.75rem,9vw,7rem)] leading-[1.05] font-bold tracking-tight text-ink"
+        >
           <span className="flex flex-wrap justify-center gap-x-[0.26em]">
             {LEAD.map((w, i) => (
               <motion.span
@@ -362,27 +391,29 @@ export default function FinalCTA() {
             <span className="relative z-10 text-ink">Yes</span>
           </motion.a>
 
-          <motion.a
-            href={CONTACT_HREF}
-            onPointerEnter={dodge}
-            onTouchStart={(e) => {
-              e.preventDefault();
-              dodge();
-            }}
-            onClick={(e) => {
-              e.preventDefault();
-              dodge();
-            }}
-            animate={{ x: off.x, y: off.y, rotate: off.r }}
-            transition={{ type: "spring", stiffness: 260, damping: 22 }}
-            className="relative inline-block cursor-pointer px-8 py-3 font-display text-2xl font-bold tracking-tight select-none sm:text-3xl"
-          >
-            <span
-              aria-hidden
-              className="absolute inset-0 -z-0 -skew-x-6 -rotate-[1.5deg] bg-[#7C2BC4]"
-            />
-            <span className="relative z-10 text-white">No</span>
-          </motion.a>
+          <div ref={noBtnWrapRef} className="relative">
+            <motion.a
+              href={CONTACT_HREF}
+              onPointerEnter={dodge}
+              onTouchStart={(e) => {
+                e.preventDefault();
+                dodge();
+              }}
+              onClick={(e) => {
+                e.preventDefault();
+                dodge();
+              }}
+              animate={{ x: off.x, y: off.y, rotate: off.r }}
+              transition={{ type: "spring", stiffness: 260, damping: 22 }}
+              className="relative inline-block cursor-pointer px-8 py-3 font-display text-2xl font-bold tracking-tight select-none sm:text-3xl"
+            >
+              <span
+                aria-hidden
+                className="absolute inset-0 -z-0 -skew-x-6 -rotate-[1.5deg] bg-[#7C2BC4]"
+              />
+              <span className="relative z-10 text-white">No</span>
+            </motion.a>
+          </div>
         </div>
       </div>
 
