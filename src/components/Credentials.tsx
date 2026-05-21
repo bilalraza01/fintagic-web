@@ -174,7 +174,7 @@ export default function Credentials() {
             <span className="relative inline-block">
               <motion.span
                 aria-hidden
-                className="absolute -inset-x-4 -inset-y-1 -z-0 origin-left -skew-x-6 -rotate-[1.5deg] bg-green"
+                className="absolute -inset-x-2 inset-y-0.5 -z-0 origin-left -skew-x-6 -rotate-[1deg] bg-green sm:-inset-x-4 sm:-inset-y-1 sm:-rotate-[1.5deg]"
                 initial={{ scaleX: 0 }}
                 whileInView={{ scaleX: 1 }}
                 viewport={{ once: true, margin: "-100px" }}
