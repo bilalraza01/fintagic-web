@@ -11,3 +11,8 @@ dist-ssr
 
 # Local Claude Code settings (personal)
 .claude/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
