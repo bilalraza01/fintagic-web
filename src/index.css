@@ -1,0 +1,109 @@
+@import "tailwindcss";
+
+@theme {
+  --color-green: #00df7f;
+  --color-green-2: #37d366;
+  --color-teal: #043d45;
+  --color-ink: #011418;
+  --color-mint: #e4f7ef;
+  --color-paper: #eef3ec;
+
+  --font-display: "Urbanist", "Urbanist Fallback", ui-sans-serif, system-ui,
+    sans-serif;
+  --font-sans: "Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
+
+  --animate-marquee: marquee 38s linear infinite;
+  --animate-marquee-rev: marquee-rev 44s linear infinite;
+}
+
+/* Metric-matched fallbacks so the webfont swap on load doesn't shift
+   text size/position (kills the reload "stutter" on headings). */
+@font-face {
+  font-family: "Urbanist Fallback";
+  src: local("Arial");
+  ascent-override: 96%;
+  descent-override: 24%;
+  line-gap-override: 0%;
+  size-adjust: 100%;
+}
+@font-face {
+  font-family: "Inter Fallback";
+  src: local("Arial");
+  ascent-override: 90%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+  size-adjust: 107%;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes marquee-rev {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+:root {
+  color-scheme: light;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--color-green);
+  color: var(--color-ink);
+}
+
+/* Slim, on-brand scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-paper);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-teal);
+  border-radius: 999px;
+  border: 3px solid var(--color-paper);
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* Reduced-motion respect */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
