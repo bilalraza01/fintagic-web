@@ -63,14 +63,12 @@ export default function Contact() {
     setStatus("sending");
     setErrorMessage(null);
 
-    const endpoint = import.meta.env.VITE_CONTACT_ENDPOINT;
-    if (!endpoint) {
-      setStatus("error");
-      setErrorMessage(
-        "Contact endpoint isn't configured. Please email us directly.",
-      );
-      return;
-    }
+    // Production endpoint baked in as the fallback so a fresh deploy works
+    // even if VITE_CONTACT_ENDPOINT wasn't set on the build host. Local dev
+    // still overrides via .env.local to point at http://localhost:3001/...
+    const endpoint =
+      import.meta.env.VITE_CONTACT_ENDPOINT ??
+      "https://api.lumelogics.com/v1/fintagic/contact";
 
     const fd = new FormData(e.currentTarget);
     const payload: ContactPayload = {
