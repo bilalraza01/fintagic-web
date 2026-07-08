@@ -1,53 +1,43 @@
 import { motion } from "framer-motion";
+import type { Variants } from "framer-motion";
 import { STATS } from "../data/site";
 import type { Stat } from "../data/site";
 import Reveal from "./Reveal";
 
-// Bento sizing + colour per stat (cycled for variety).
-// Mobile: 2-col bento (5 rows). Desktop (lg): 4-col bento (3 rows).
+const EASE = [0.22, 1, 0.36, 1] as const;
+
+// Single parent trigger fires once; each tile inherits the "show" state and
+// reads its stagger delay from `custom={i}`. Avoids per-tile IntersectionObservers,
+// which were missing for some tiles on mobile.
+const tileVariant: Variants = {
+  hidden: { opacity: 0, scale: 0 },
+  show: (i: number) => ({
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.6, delay: i * 0.07, ease: EASE },
+  }),
+};
+
+// Bento sizing + colour per stat. Mobile flows naturally (2-col, every tile 1×1);
+// only the desktop (lg) bento uses explicit grid placement.
 const LAYOUT = [
-  // STATS[0] — Mobile: col 2, rows 1-2 tall.  Desktop: col 2, rows 1-2 tall.
+  // STATS[0] — Desktop: col 2, rows 1-2 tall (feature tile).
+  { span: "lg:col-start-2 lg:row-start-1 lg:row-span-2", bg: "#D9B8FF" },
+  // STATS[1] — Desktop: cols 3-4 row 1 (wide top).
   {
-    span:
-      "col-start-2 row-start-1 row-span-2 lg:col-start-2 lg:row-start-1 lg:row-span-2",
-    bg: "#D9B8FF",
-  },
-  // STATS[1] — Mobile: col 1, rows 2-3 tall.  Desktop: cols 3-4 row 1 (wide top).
-  {
-    span:
-      "col-start-1 row-start-2 row-span-2 lg:col-start-3 lg:col-span-2 lg:row-start-1 lg:row-span-1",
+    span: "lg:col-start-3 lg:col-span-2 lg:row-start-1 lg:row-span-1",
     bg: "#B9F08A",
   },
-  // STATS[2] — Mobile: col 2, row 4.  Desktop: col 4, row 2.
-  {
-    span:
-      "col-start-2 row-start-4 row-span-1 col-span-1 lg:col-start-4 lg:col-span-1 lg:row-start-2 lg:row-span-1",
-    bg: "#C9F5DD",
-  },
-  // STATS[3] — Mobile: col 2, row 3.  Desktop: col 3, rows 2-3 (tall).
-  {
-    span:
-      "col-start-2 row-start-3 row-span-1 col-span-1 lg:col-start-3 lg:col-span-1 lg:row-start-2 lg:row-span-2",
-    bg: "#7BE8D8",
-  },
-  // STATS[4] — Mobile: row 5, full width.  Desktop: col 4, row 3.
-  {
-    span:
-      "col-start-1 col-span-2 row-start-5 row-span-1 lg:col-start-4 lg:col-span-1 lg:row-start-3 lg:row-span-1",
-    bg: "#D9B8FF",
-  },
-  // STATS[5] — Mobile: col 1, row 4.  Desktop: col 2, row 3.
-  {
-    span:
-      "col-start-1 row-start-4 row-span-1 col-span-1 lg:col-start-2 lg:col-span-1 lg:row-start-3 lg:row-span-1",
-    bg: "#B9F08A",
-  },
-  // STATS[6] — Mobile: col 1, row 1.  Desktop: col 1, rows 2-3 (tall).
-  {
-    span:
-      "col-start-1 row-start-1 row-span-1 col-span-1 lg:col-start-1 lg:col-span-1 lg:row-start-2 lg:row-span-2",
-    bg: "#7BE8D8",
-  },
+  // STATS[2] — Desktop: col 4 row 2.
+  { span: "lg:col-start-4 lg:row-start-2 lg:row-span-1", bg: "#C9F5DD" },
+  // STATS[3] — Desktop: col 3, rows 2-3 (tall).
+  { span: "lg:col-start-3 lg:row-start-2 lg:row-span-2", bg: "#7BE8D8" },
+  // STATS[4] — Desktop: col 4 row 3.
+  { span: "lg:col-start-4 lg:row-start-3 lg:row-span-1", bg: "#D9B8FF" },
+  // STATS[5] — Desktop: col 2 row 3.
+  { span: "lg:col-start-2 lg:row-start-3 lg:row-span-1", bg: "#B9F08A" },
+  // STATS[6] — Desktop: col 1, rows 2-3 (tall; top of col 1 stays empty).
+  { span: "lg:col-start-1 lg:row-start-2 lg:row-span-2", bg: "#7BE8D8" },
 ];
 
 function format(s: Stat) {
@@ -75,28 +65,22 @@ export default function Stats() {
           </Reveal>
         </div>
 
-        <div className="mt-16 grid grid-cols-2 gap-px auto-rows-[170px] lg:auto-rows-auto lg:grid-cols-[19fr_29fr_19fr_29fr] lg:grid-rows-[170px_170px_200px]">
+        <motion.div
+          className="mt-16 grid grid-cols-2 gap-px auto-rows-[170px] lg:auto-rows-auto lg:grid-cols-[19fr_29fr_19fr_29fr] lg:grid-rows-[170px_170px_200px]"
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-70px" }}
+        >
           {STATS.map((s, i) => {
             const { span, bg } = LAYOUT[i % LAYOUT.length];
             const fromTop = i % 2 === 0;
-            const hidden = fromTop
-              ? "inset(0% 100% 100% 0% round 16px)"
-              : "inset(100% 100% 0% 0% round 16px)";
+            const transformOrigin = fromTop ? "top left" : "bottom left";
             return (
               <motion.div
                 key={i}
-                initial={{ clipPath: hidden, opacity: 0 }}
-                whileInView={{
-                  clipPath: "inset(0% 0% 0% 0% round 16px)",
-                  opacity: 1,
-                }}
-                viewport={{ once: true, margin: "-70px" }}
-                transition={{
-                  duration: 0.6,
-                  delay: i * 0.07,
-                  ease: [0.22, 1, 0.36, 1],
-                }}
-                style={{ background: bg }}
+                variants={tileVariant}
+                custom={i}
+                style={{ background: bg, transformOrigin }}
                 className={`flex flex-col justify-end overflow-hidden rounded-2xl p-5 lg:p-7 ${span}`}
               >
                 <span className="font-display text-[clamp(2.25rem,5vw,55px)] font-bold tracking-tight text-ink">
@@ -108,7 +92,7 @@ export default function Stats() {
               </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

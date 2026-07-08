@@ -6,7 +6,11 @@ import {
   useTransform,
 } from "framer-motion";
 import type { MotionValue } from "framer-motion";
+import { Link } from "react-router";
 import { CONTACT_HREF } from "../data/site";
+
+// Link driven by framer-motion — client-side nav + whileHover/whileTap/animate.
+const MotionLink = motion.create(Link);
 
 const LEAD = ["Ready", "For"];
 const HILITE = ["Clean", "Books?"];
@@ -377,8 +381,8 @@ export default function FinalCTA() {
         </h2>
 
         <div className="relative mt-14 flex items-center justify-center gap-10 sm:mt-20 sm:gap-14">
-          <motion.a
-            href={CONTACT_HREF}
+          <MotionLink
+            to={CONTACT_HREF}
             whileHover={{ y: -4, scale: 1.04 }}
             whileTap={{ scale: 0.96 }}
             transition={{ type: "spring", stiffness: 300, damping: 22 }}
@@ -389,11 +393,11 @@ export default function FinalCTA() {
               className="absolute inset-0 -z-0 -skew-x-6 -rotate-[1.5deg] bg-green"
             />
             <span className="relative z-10 text-ink">Yes</span>
-          </motion.a>
+          </MotionLink>
 
           <div ref={noBtnWrapRef} className="relative">
-            <motion.a
-              href={CONTACT_HREF}
+            <MotionLink
+              to={CONTACT_HREF}
               onPointerEnter={dodge}
               onTouchStart={(e) => {
                 e.preventDefault();
@@ -412,7 +416,7 @@ export default function FinalCTA() {
                 className="absolute inset-0 -z-0 -skew-x-6 -rotate-[1.5deg] bg-[#7C2BC4]"
               />
               <span className="relative z-10 text-white">No</span>
-            </motion.a>
+            </MotionLink>
           </div>
         </div>
       </div>

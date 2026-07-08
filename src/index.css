@@ -8,31 +8,35 @@
   --color-mint: #e4f7ef;
   --color-paper: #eef3ec;
 
-  --font-display: "Urbanist", "Urbanist Fallback", ui-sans-serif, system-ui,
+  --font-display: "Urbanist Variable", "Urbanist Fallback", ui-sans-serif,
+    system-ui, sans-serif;
+  --font-sans: "Inter Variable", "Inter Fallback", ui-sans-serif, system-ui,
     sans-serif;
-  --font-sans: "Inter", "Inter Fallback", ui-sans-serif, system-ui, sans-serif;
 
   --animate-marquee: marquee 38s linear infinite;
   --animate-marquee-rev: marquee-rev 44s linear infinite;
 }
 
-/* Metric-matched fallbacks so the webfont swap on load doesn't shift
-   text size/position (kills the reload "stutter" on headings). */
+/* Metric-matched fallbacks so the webfont swap occupies the *exact same line
+   box* as the real font — eliminates the reload resize. Values computed
+   Capsize-style from published font metrics:
+   size-adjust  = (target.xWidthAvg / target.UPM) / (Arial.xWidthAvg / Arial.UPM)
+   *-override   = target.{ascent,descent,lineGap} / target.UPM. */
 @font-face {
   font-family: "Urbanist Fallback";
-  src: local("Arial");
-  ascent-override: 96%;
-  descent-override: 24%;
+  src: local("Arial"), local("Helvetica Neue"), local("Helvetica");
+  ascent-override: 100%;
+  descent-override: 20%;
   line-gap-override: 0%;
-  size-adjust: 100%;
+  size-adjust: 113.27%;
 }
 @font-face {
   font-family: "Inter Fallback";
-  src: local("Arial");
-  ascent-override: 90%;
-  descent-override: 22%;
+  src: local("Arial"), local("Helvetica Neue"), local("Helvetica");
+  ascent-override: 96.88%;
+  descent-override: 24.15%;
   line-gap-override: 0%;
-  size-adjust: 107%;
+  size-adjust: 117.21%;
 }
 
 @keyframes marquee {
